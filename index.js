@@ -158,15 +158,71 @@ for (const [name, route] of Object.entries(routes)) {
 connectDB();
 
 // =====================================================
-// GLOBAL MIDDLEWARE
+// CORS CONFIGURATION
+// =====================================================
+
+// Frontend URLs allowed to access this backend
+
+const allowedOrigins = [
+
+  // Local Vite frontend
+  "http://localhost:5173",
+
+  // Local frontend using 127.0.0.1
+  "http://127.0.0.1:5173",
+
+  // Deployed Vercel frontend
+  "https://finova-six-beta.vercel.app"
+
+];
+
+// =====================================================
+// CORS MIDDLEWARE
 // =====================================================
 
 app.use(
   cors({
-    origin: "https://YOUR-FRONTEND.vercel.app",
-    credentials: true,
+
+    origin: function (origin, callback) {
+
+      // Allow requests that do not contain an Origin
+      // Example: Postman, server-to-server requests
+      if (!origin) {
+
+        return callback(null, true);
+
+      }
+
+      // Check whether the frontend is allowed
+      if (allowedOrigins.includes(origin)) {
+
+        console.log(
+          `CORS allowed: ${origin}`
+        );
+
+        return callback(null, true);
+
+      }
+
+      // Reject unknown origins
+      console.log(
+        `CORS blocked: ${origin}`
+      );
+
+      return callback(
+        new Error("Not allowed by CORS")
+      );
+
+    },
+
+    credentials: true
+
   })
 );
+
+// =====================================================
+// GLOBAL MIDDLEWARE
+// =====================================================
 
 app.use(
   express.json()
@@ -265,6 +321,7 @@ app.listen(
   () => {
 
     console.log("");
+
     console.log("==========================================");
     console.log("NSFDC BACKEND SERVER");
     console.log("==========================================");
@@ -278,6 +335,20 @@ app.listen(
     );
 
     console.log("");
+
+    console.log("Allowed CORS Origins:");
+    console.log("------------------------------------------");
+
+    allowedOrigins.forEach(
+      (origin) => {
+        console.log(origin);
+      }
+    );
+
+    console.log("------------------------------------------");
+
+    console.log("");
+
     console.log("Available API Routes:");
     console.log("------------------------------------------");
 
@@ -310,7 +381,11 @@ app.listen(
     );
 
     console.log("------------------------------------------");
-    console.log("Server started successfully.");
+
+    console.log(
+      "Server started successfully."
+    );
+
     console.log("==========================================");
     console.log("");
 
