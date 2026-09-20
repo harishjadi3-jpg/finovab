@@ -161,7 +161,12 @@ connectDB();
 // GLOBAL MIDDLEWARE
 // =====================================================
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://YOUR-FRONTEND.vercel.app",
+    credentials: true,
+  })
+);
 
 app.use(
   express.json()
